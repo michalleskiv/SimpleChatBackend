@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SimpleChat.Hubs;
 
 namespace SimpleChat
 {
@@ -14,6 +11,17 @@ namespace SimpleChat
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder => builder
+                    .WithOrigins("http://localhost:4200") // the Angular app url
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
+
+            services.AddControllers();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -24,6 +32,10 @@ namespace SimpleChat
             }
 
             app.UseRouting();
+            app.UseCors("CorsPolicy");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -31,6 +43,8 @@ namespace SimpleChat
                 {
                     await context.Response.WriteAsync("Hello World!");
                 });
+                endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

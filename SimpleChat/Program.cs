@@ -20,7 +20,7 @@ namespace SimpleChat
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>().UseUrls("https://192.168.0.102:44327");
                 });
     }
 }
